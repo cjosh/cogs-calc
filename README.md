@@ -1,7 +1,7 @@
 # cogscalcapp
 
 Local COGS / unit-economics calculator. Implements the spec in
-[`../cogscalc.md`](../cogscalc.md). Runs entirely on your machine — no
+[`../main/cogscalc.md`](../main/cogscalc.md). Runs entirely on your machine — no
 hosting, no auth, no SaaS.
 
 ## Run it
