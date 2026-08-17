@@ -339,6 +339,40 @@ export function createRouter(db: DatabaseSync): Router {
     res.status(201).json(snapshotToJson(snapshot as any));
   });
 
+  // Read-only "what if" recompute: same cost math as GET /products/:id, but
+  // against a hypothetical unit count instead of the product's stored one.
+  // Nothing is written — just reuses computeCostSummary with a different divisor.
+  router.get('/products/:id/simulate', (req, res) => {
+    const id = asId(req.params.id);
+    const product = getProductOr404(id);
+
+    const unitCount = Number(req.query.unitCount);
+    if (!Number.isInteger(unitCount) || unitCount < 1) {
+      throw new ApiError(400, 'unitCount query param must be a positive integer');
+    }
+
+    const withTiers = loadTransactionsWithTiers(db, product.id);
+    const resolved: ResolvedTransaction[] = withTiers.map(({ row, tiers }) => ({
+      type: row.type,
+      unitBasis: row.unit_basis,
+      isActive: row.is_active === 1,
+      amount: resolveAmount(row, tiers, unitCount),
+    }));
+    const summary = computeCostSummary(resolved, unitCount);
+    const costBasis = costBasisFor(summary, product.margin_basis);
+
+    res.json({
+      productId: product.id,
+      unitCount,
+      summary: { ...summary, costBasis },
+      marginBasis: product.margin_basis,
+      impliedMarginAtCurrentTargetPrice:
+        product.target_price != null ? marginFromPrice(costBasis, product.target_price) : null,
+      priceAtCurrentTargetMargin:
+        product.target_margin_pct != null ? priceFromMargin(costBasis, product.target_margin_pct) : null,
+    });
+  });
+
   router.get('/products/:id/snapshots', (req, res) => {
     const id = asId(req.params.id);
     getProductOr404(id);
