@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>COGS Calculator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>COGS Calculator</h1>
+    <p class="subtitle">Local unit-economics sandbox — not a bookkeeping system.</p>
+  </header>
+
+  <nav id="productTabs" class="product-tabs" aria-label="Products"></nav>
+
+  <main id="app" class="app-body" hidden>
+    <section class="panel" id="productHeaderPanel">
+      <div class="panel-header">
+        <h2>Product</h2>
+        <span id="stateBadge" class="badge">Draft</span>
+      </div>
+      <div class="form-grid">
+        <label>Name
+          <input type="text" id="productName" />
+        </label>
+        <label>Units for this draft
+          <span class="qmark" data-help="unitCount">?</span>
+          <input type="number" id="productUnitCount" min="1" step="1" />
+        </label>
+        <label>Margin basis
+          <span class="qmark" data-help="marginBasis">?</span>
+          <select id="productMarginBasis">
+            <option value="cogs_only">COGS-only (recommended)</option>
+            <option value="fully_loaded">Fully-loaded</option>
+          </select>
+        </label>
+        <label class="span-2">Notes
+          <textarea id="productNotes" rows="2"></textarea>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="saveProductBtn">Save product</button>
+        <button id="lockBtn" class="secondary">Lock in this order</button>
+        <button id="deleteProductBtn" class="danger">Delete product</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Transactions</h2>
+        <span class="qmark" data-help="transactionsIntro">?</span>
+      </div>
+      <div class="table-wrap">
+        <table id="txTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Basis</th>
+              <th>Amount</th>
+              <th>Tiers <span class="qmark" data-help="tiers">?</span></th>
+              <th>Active</th>
+              <th>Group <span class="qmark" data-help="alternativeGroup">?</span></th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="txRows"></tbody>
+          <tfoot id="txAddRow"></tfoot>
+        </table>
+      </div>
+      <datalist id="alternativeGroupOptions"></datalist>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Summary</h2>
+      </div>
+      <div class="summary-grid">
+        <div class="stat">
+          <div class="stat-label">Per-unit cost (COGS-only) <span class="qmark" data-help="perUnitCogsOnly">?</span></div>
+          <div class="stat-value" id="statCogsOnly">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Per-unit cost (fully-loaded) <span class="qmark" data-help="perUnitFullyLoaded">?</span></div>
+          <div class="stat-value" id="statFullyLoaded">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Total budget <span class="qmark" data-help="totalBudget">?</span></div>
+          <div class="stat-value" id="statBudget">—</div>
+        </div>
+      </div>
+
+      <div class="pricing-grid">
+        <label>Target margin % <span class="qmark" data-help="targetMargin">?</span>
+          <input type="number" id="priceMargin" step="0.01" placeholder="e.g. 0.5 for 50%" />
+        </label>
+        <label>Target retail price
+          <input type="number" id="priceTarget" step="0.01" />
+        </label>
+        <button id="recalcBtn" class="secondary" title="Costs may have changed since these were last set — re-derive price from the current margin.">Recalculate from margin</button>
+      </div>
+      <p class="hint">Edit either field and click away (blur) to recalculate the other — off the cost basis selected above.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Order history</h2>
+      </div>
+      <div id="snapshotList" class="snapshot-list"></div>
+    </section>
+  </main>
+
+  <details class="glossary-panel">
+    <summary>Glossary — click to expand</summary>
+    <dl id="glossaryList"></dl>
+  </details>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
